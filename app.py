@@ -5,6 +5,7 @@ from groq import Groq
 import json
 from workflow import AstroBotWorkflow
 from space_facts import SpaceFactsGenerator
+from story import SpaceTravelStoryGenerator
 
 app = Flask(__name__)
 
@@ -12,6 +13,7 @@ NASA_API_KEY = "8gldDFCSaaAFEEsld1qYR2BAqCywsEmDCH1gkb3m"
 GROQ_API_KEY = "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"  # Replace with your actual GROQ API key
 astro_workflow = AstroBotWorkflow(GROQ_API_KEY)
 space_facts_generator = SpaceFactsGenerator(GROQ_API_KEY)
+story_generator = SpaceTravelStoryGenerator(GROQ_API_KEY)
 
 
 @app.route("/")
@@ -156,6 +158,19 @@ def calculate_weight():
         return render_template("utilities.html", result=result, planet=planet)
     except:
         return render_template("utilities.html", error="Invalid input.")
+
+
+@app.route("/story", methods=["GET", "POST"])
+def story():
+    if request.method == "POST":
+        destination = request.form.get("destination")
+        if destination:
+            # Generate the story
+            story_result = story_generator.generate_travel_story(destination)
+            return render_template("story.html", story_result=story_result)
+
+    # GET request - show the form
+    return render_template("story.html")
 
 
 @app.route("/iss-pass")
